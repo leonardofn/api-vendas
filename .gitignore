@@ -122,6 +122,10 @@ dist
 # TernJS port file
 .tern-port
 
+# VSCode Editor
+.idea/
+.vscode/
+
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
@@ -140,5 +144,15 @@ dist
 
 # SvelteKit build / generate output
 .svelte-kit
+
+# Others
+build/
+temp/
+dist
+coverage
+ormconfig.json
+
+uploads/*
+!uploads/.gitkeep
 
 # End of https://www.toptal.com/developers/gitignore/api/node
