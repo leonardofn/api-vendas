@@ -7,7 +7,6 @@ export const AppDataSource = new DataSource({
   username: 'postgres',
   password: 'docker',
   database: 'apivendas',
-  entities: [],
   migrations: ['./src/shared/typeorm/migrations/*.ts'],
   synchronize: true,
 });
