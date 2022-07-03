@@ -8,5 +8,6 @@ export const AppDataSource = new DataSource({
   password: 'docker',
   database: 'apivendas',
   entities: [],
+  migrations: ['./src/shared/typeorm/migrations/*.ts'],
   synchronize: true,
 });
