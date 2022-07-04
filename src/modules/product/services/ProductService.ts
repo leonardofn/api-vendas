@@ -26,6 +26,12 @@ class ProductService {
 
     return product;
   }
+
+  public async index(): Promise<Product[]> {
+    const products = await ProductRepository.find();
+
+    return products;
+  }
 }
 
 export default ProductService;
