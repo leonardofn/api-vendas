@@ -70,6 +70,16 @@ class ProductService {
 
     return product;
   }
+
+  public async delete({ id }: IRequest): Promise<void> {
+    const product = await ProductRepository.findOneBy({ id });
+
+    if (!product) {
+      throw new AppError('Product not found.');
+    }
+
+    await ProductRepository.remove(product);
+  }
 }
 
 export default ProductService;
