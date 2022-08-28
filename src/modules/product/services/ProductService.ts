@@ -6,6 +6,7 @@ interface IRequest {
   name: string;
   price: number;
   quantity: number;
+  id?: string;
 }
 
 class ProductService {
@@ -31,6 +32,16 @@ class ProductService {
     const products = await ProductRepository.find();
 
     return products;
+  }
+
+  public async findById({ id }: IRequest): Promise<Product> {
+    const product = await ProductRepository.findOneBy({ id });
+
+    if (!product) {
+      throw new AppError('Product not found.');
+    }
+
+    return product;
   }
 }
 
