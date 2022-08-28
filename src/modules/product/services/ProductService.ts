@@ -43,6 +43,33 @@ class ProductService {
 
     return product;
   }
+
+  public async update({
+    id,
+    name,
+    price,
+    quantity,
+  }: IRequest): Promise<Product> {
+    const product = await ProductRepository.findOneBy({ id });
+
+    if (!product) {
+      throw new AppError('Product not found.');
+    }
+
+    const productExists = await ProductRepository.findByName(name);
+
+    if (productExists.length && name !== product.name) {
+      throw new AppError('There is already one product with is name.');
+    }
+
+    product.name = name;
+    product.price = price;
+    product.quantity = quantity;
+
+    await ProductRepository.save(product);
+
+    return product;
+  }
 }
 
 export default ProductService;
