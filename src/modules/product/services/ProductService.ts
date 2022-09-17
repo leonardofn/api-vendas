@@ -34,7 +34,7 @@ class ProductService {
     return products;
   }
 
-  public async findById({ id }: IRequest): Promise<Product> {
+  public async findById(id: string): Promise<Product> {
     const product = await ProductRepository.findOneBy({ id });
 
     if (!product) {
@@ -71,7 +71,7 @@ class ProductService {
     return product;
   }
 
-  public async delete({ id }: IRequest): Promise<void> {
+  public async delete(id: string): Promise<void> {
     const product = await ProductRepository.findOneBy({ id });
 
     if (!product) {
