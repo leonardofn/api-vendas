@@ -3,7 +3,9 @@ import {
   CreateDateColumn,
   Entity,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from 'typeorm';
+import ColumnDecimalTransformer from '@shared/transformers/ColumnNumericTransformer';
 
 @Entity()
 class Product {
@@ -13,7 +15,9 @@ class Product {
   @Column()
   name: string;
 
-  @Column('decimal')
+  @Column('decimal', {
+    transformer: new ColumnDecimalTransformer(),
+  })
   price: number;
 
   @Column('int')
@@ -22,7 +26,7 @@ class Product {
   @CreateDateColumn()
   created_at: Date;
 
-  @CreateDateColumn()
+  @UpdateDateColumn()
   updated_at: Date;
 }
 
