@@ -1,5 +1,6 @@
 import AppError from '@shared/errors/AppError';
 import { compare } from 'bcryptjs';
+import { sign } from 'jsonwebtoken';
 import User from '../entities/User';
 import { UserRepository } from '../repositories/UserRepository';
 
@@ -8,8 +9,13 @@ interface IRequest {
   password: string;
 }
 
+interface IResponse {
+  user: User;
+  token: string;
+}
+
 class UserAuthService {
-  public async execute({ email, password }: IRequest): Promise<User> {
+  public async execute({ email, password }: IRequest): Promise<IResponse> {
     const user = await UserRepository.findByEmail(email);
 
     if (!user) {
@@ -22,7 +28,12 @@ class UserAuthService {
       throw new AppError('Incorrect email/password combination.', 401);
     }
 
-    return user;
+    const token = sign({}, '712acacd12c31887d2fbef7640663552', {
+      subject: user.id,
+      expiresIn: '1d',
+    });
+
+    return { user, token };
   }
 }
 
