@@ -21,7 +21,7 @@ export default class Controller {
     request: Request,
     response: Response,
   ): Promise<Response> => {
-    const { name, emial: email, password } = request.body;
+    const { name, email, password } = request.body;
 
     const user = await this.userService.create({ name, email, password });
 
