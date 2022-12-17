@@ -5,7 +5,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import ColumnDecimalTransformer from '@shared/transformers/ColumnNumericTransformer';
+import ColumnDecimalTransformer from '../../../shared/transformers/ColumnNumericTransformer';
 
 @Entity()
 class Product {

@@ -9,5 +9,5 @@ export const AppDataSource = new DataSource({
   database: 'apivendas',
   entities: ['./src/modules/**/entities/*.ts'],
   migrations: ['./src/shared/typeorm/migrations/*.ts'],
-  synchronize: true,
+  synchronize: false,
 });
