@@ -1,4 +1,5 @@
 import AppError from '@shared/errors/AppError';
+import { hash } from 'bcryptjs';
 import User from '../entities/User';
 import { UserRepository } from '../repositories/UserRepository';
 
@@ -17,10 +18,12 @@ class UserService {
       throw new AppError('Email address already used.');
     }
 
+    const hashedPassword = await hash(password, 8);
+
     const user = UserRepository.create({
       name,
       email,
-      password,
+      password: hashedPassword,
     });
 
     await UserRepository.save(user);
