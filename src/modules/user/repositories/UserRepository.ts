@@ -1,5 +1,5 @@
 import { AppDataSource } from '@config/db.config';
-import User from '../entitities/User';
+import User from '../entities/User';
 
 export const UserRepository = AppDataSource.getRepository(User).extend({
   async findByName(name: string): Promise<User | null> {
