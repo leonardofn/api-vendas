@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import UserAvatarService from '../services/UserAvatarService';
 
-export default class UserAuthController {
+export default class UserAvatarController {
   private userAvatarService: UserAvatarService;
 
   constructor() {
     this.userAvatarService = new UserAvatarService();
   }
 
-  public updateAvatar = async (
+  public update = async (
     request: Request,
     response: Response,
   ): Promise<Response> => {
