@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 import ColumnDecimalTransformer from '../../../shared/transformers/ColumnNumericTransformer';
 
-@Entity()
+@Entity('products')
 class Product {
   @PrimaryGeneratedColumn('uuid')
   id: string;
