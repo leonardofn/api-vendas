@@ -14,7 +14,7 @@ export default class ForgotPasswordController {
   ): Promise<Response> => {
     const { email } = request.body;
 
-    this.sendForgotPasswordEmailService.execute({ email });
+    await this.sendForgotPasswordEmailService.execute({ email });
 
     return response.status(204).json();
   };
