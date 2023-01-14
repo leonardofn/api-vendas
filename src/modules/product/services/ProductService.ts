@@ -38,7 +38,7 @@ class ProductService {
     const product = await ProductRepository.findOneBy({ id });
 
     if (!product) {
-      throw new AppError('Product not found.');
+      throw new AppError('Product not found.', 404);
     }
 
     return product;
@@ -53,7 +53,7 @@ class ProductService {
     const product = await ProductRepository.findOneBy({ id });
 
     if (!product) {
-      throw new AppError('Product not found.');
+      throw new AppError('Product not found.', 404);
     }
 
     const productExists = await ProductRepository.findByName(name);
@@ -75,7 +75,7 @@ class ProductService {
     const product = await ProductRepository.findOneBy({ id });
 
     if (!product) {
-      throw new AppError('Product not found.');
+      throw new AppError('Product not found.', 404);
     }
 
     await ProductRepository.remove(product);
