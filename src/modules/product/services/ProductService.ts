@@ -1,4 +1,5 @@
 import AppError from '@shared/errors/AppError';
+import { StatusCodes } from 'http-status-codes';
 import Product from '../entities/Product';
 import { ProductRepository } from './../repositories/ProductRepository';
 
@@ -14,7 +15,10 @@ class ProductService {
     const productExists = await ProductRepository.findByName(name);
 
     if (productExists) {
-      throw new AppError('There is already one product with is name.');
+      throw new AppError(
+        'There is already one product with is name.',
+        StatusCodes.CONFLICT,
+      );
     }
 
     const product = ProductRepository.create({
@@ -38,7 +42,7 @@ class ProductService {
     const product = await ProductRepository.findOneBy({ id });
 
     if (!product) {
-      throw new AppError('Product not found.', 404);
+      throw new AppError('Product not found.', StatusCodes.NOT_FOUND);
     }
 
     return product;
@@ -53,13 +57,16 @@ class ProductService {
     const product = await ProductRepository.findOneBy({ id });
 
     if (!product) {
-      throw new AppError('Product not found.', 404);
+      throw new AppError('Product not found.', StatusCodes.NOT_FOUND);
     }
 
     const productExists = await ProductRepository.findByName(name);
 
     if (productExists && name !== product.name) {
-      throw new AppError('There is already one product with is name.');
+      throw new AppError(
+        'There is already one product with is name.',
+        StatusCodes.CONFLICT,
+      );
     }
 
     product.name = name;
@@ -75,7 +82,7 @@ class ProductService {
     const product = await ProductRepository.findOneBy({ id });
 
     if (!product) {
-      throw new AppError('Product not found.', 404);
+      throw new AppError('Product not found.', StatusCodes.NOT_FOUND);
     }
 
     await ProductRepository.remove(product);

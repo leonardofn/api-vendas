@@ -1,5 +1,6 @@
 import AppError from '@shared/errors/AppError';
 import fs from 'fs';
+import { StatusCodes } from 'http-status-codes';
 import path from 'path';
 import uploadConfig from '../../../config/upload';
 import User from '../entities/User';
@@ -18,7 +19,7 @@ class UserAvatarService {
     const user = await UserRepository.findById(user_id);
 
     if (!user) {
-      throw new AppError('User not found', 404);
+      throw new AppError('User not found', StatusCodes.NOT_FOUND);
     }
 
     if (user.avatar) {

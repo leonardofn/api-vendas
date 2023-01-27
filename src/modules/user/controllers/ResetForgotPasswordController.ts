@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import ResetPasswordService from '../services/ResetPasswordService';
 
 export default class ResetPasswordController {
@@ -16,6 +17,6 @@ export default class ResetPasswordController {
 
     await this.resetPasswordService.execute({ password, token });
 
-    return response.status(204).json();
+    return response.status(StatusCodes.NO_CONTENT).json();
   };
 }

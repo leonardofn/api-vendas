@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { StatusCodes } from 'http-status-codes';
 import SendForgotPasswordEmailService from '../services/SendForgotPasswordEmailService';
 
 export default class ForgotPasswordController {
@@ -16,6 +17,6 @@ export default class ForgotPasswordController {
 
     await this.sendForgotPasswordEmailService.execute({ email });
 
-    return response.status(204).json();
+    return response.status(StatusCodes.NO_CONTENT).json();
   };
 }

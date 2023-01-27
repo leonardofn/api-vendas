@@ -1,5 +1,6 @@
 import AppError from '@shared/errors/AppError';
 import { hash } from 'bcryptjs';
+import { StatusCodes } from 'http-status-codes';
 import User from '../entities/User';
 import { UserRepository } from '../repositories/UserRepository';
 
@@ -15,7 +16,7 @@ class UserService {
     const userExists = await UserRepository.findByEmail(email);
 
     if (userExists) {
-      throw new AppError('Email address already used.');
+      throw new AppError('Email address already used.', StatusCodes.CONFLICT);
     }
 
     const hashedPassword = await hash(password, 8);

@@ -1,4 +1,5 @@
 import AppError from '@shared/errors/AppError';
+import { StatusCodes } from 'http-status-codes';
 import { UserRepository } from './../repositories/UserRepository';
 import { UserTokenRepository } from './../repositories/UserTokenRepository';
 
@@ -11,7 +12,7 @@ class SendForgotPasswordEmailService {
     const user = await UserRepository.findByEmail(email);
 
     if (!user) {
-      throw new AppError('User does not exists.', 404);
+      throw new AppError('User does not exists.', StatusCodes.NOT_FOUND);
     }
 
     const token = await UserTokenRepository.generate(user.id);
