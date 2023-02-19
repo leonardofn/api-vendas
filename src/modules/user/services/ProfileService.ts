@@ -13,7 +13,7 @@ interface IRequest {
 }
 
 class ProfileService {
-  public async show({ user_id }: IRequest): Promise<User> {
+  public async show(user_id: string): Promise<User> {
     const user = await UserRepository.findById(user_id);
 
     if (!user) {
