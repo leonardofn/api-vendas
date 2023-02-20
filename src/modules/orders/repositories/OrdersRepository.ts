@@ -42,7 +42,7 @@ export const OrdersRepository = AppDataSource.getRepository(Order).extend({
       order_products: products,
     });
 
-    this.save(order);
+    await this.save(order);
 
     return order;
   },

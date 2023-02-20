@@ -56,7 +56,7 @@ class OrderService {
     if (quantityAvailable.length > 0) {
       throw new AppError(
         `The quantity ${quantityAvailable[0].quantity} is not available for product ${quantityAvailable[0].id}`,
-        StatusCodes.NOT_FOUND,
+        StatusCodes.CONFLICT,
       );
     }
 
@@ -76,7 +76,7 @@ class OrderService {
     const updatedProductQuantity = order_products.map(product => ({
       id: product.product_id,
       quantity:
-        foundProducts.filter(p => p.id === product.id)[0].quantity -
+        foundProducts.filter(p => p.id === product.product_id)[0].quantity -
         product.quantity,
     }));
 
