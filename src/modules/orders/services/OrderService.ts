@@ -84,6 +84,16 @@ class OrderService {
 
     return order;
   }
+
+  public async show(id: string) {
+    const order = await OrdersRepository.findById(id);
+
+    if (!order) {
+      throw new AppError('Order not found.', StatusCodes.NOT_FOUND);
+    }
+
+    return order;
+  }
 }
 
 export default OrderService;
