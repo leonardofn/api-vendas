@@ -16,6 +16,12 @@ class OrdersProducts {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column()
+  order_id: string;
+
+  @Column()
+  product_id: string;
+
   @Column('decimal', {
     transformer: new ColumnDecimalTransformer(),
   })
