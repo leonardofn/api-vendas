@@ -1,21 +1,20 @@
-import OrdersProducts from '@modules/orders/entities/OrdersProducts';
+import Product from '@modules/product/entities/Product';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import ColumnDecimalTransformer from '../../../shared/transformers/ColumnDecimalTransformer';
+import Order from './Order';
 
-@Entity('products')
-class Product {
+@Entity('orders_products')
+class OrdersProducts {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column()
-  name: string;
 
   @Column('decimal', {
     transformer: new ColumnDecimalTransformer(),
@@ -31,8 +30,13 @@ class Product {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @OneToMany(() => OrdersProducts, order_products => order_products.product)
-  order_products: OrdersProducts[];
+  @ManyToOne(() => Order, order => order.order_products)
+  @JoinColumn({ name: 'order_id' })
+  order: Order;
+
+  @ManyToOne(() => Product, product => product.order_products)
+  @JoinColumn({ name: 'product_id' })
+  product: Product;
 }
 
-export default Product;
+export default OrdersProducts;
