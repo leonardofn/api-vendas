@@ -1,3 +1,5 @@
+import RedisCache from '@shared/cache/CacheRedis';
+import { RedisKeys } from '@shared/cache/redis-keys';
 import AppError from '@shared/errors/AppError';
 import { StatusCodes } from 'http-status-codes';
 import Product from '../entities/Product';
@@ -11,6 +13,12 @@ interface IRequest {
 }
 
 class ProductService {
+  private redisCache: RedisCache;
+
+  constructor() {
+    this.redisCache = new RedisCache();
+  }
+
   public async create({ name, price, quantity }: IRequest): Promise<Product> {
     const productExists = await ProductRepository.findByName(name);
 
@@ -27,13 +35,19 @@ class ProductService {
       quantity,
     });
 
+    await this.redisCache.invalidate(RedisKeys.PRODUCT_LIST);
+
     await ProductRepository.save(product);
 
     return product;
   }
 
   public async index(): Promise<Product[]> {
-    const products = await ProductRepository.find();
+    const products =
+      (await this.redisCache.recover<Product[]>(RedisKeys.PRODUCT_LIST)) ||
+      (await ProductRepository.find());
+
+    await this.redisCache.save<Product[]>(RedisKeys.PRODUCT_LIST, products);
 
     return products;
   }
@@ -69,6 +83,8 @@ class ProductService {
       );
     }
 
+    await this.redisCache.invalidate(RedisKeys.PRODUCT_LIST);
+
     product.name = name;
     product.price = price;
     product.quantity = quantity;
@@ -84,6 +100,8 @@ class ProductService {
     if (!product) {
       throw new AppError('Product not found.', StatusCodes.NOT_FOUND);
     }
+
+    await this.redisCache.invalidate(RedisKeys.PRODUCT_LIST);
 
     await ProductRepository.remove(product);
   }
