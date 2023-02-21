@@ -1,3 +1,4 @@
+import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
 import UserAuthService from '../services/UserAuthService';
 
@@ -19,6 +20,6 @@ export default class UserAuthController {
       password,
     });
 
-    return response.json(user);
+    return response.json(instanceToInstance(user));
   };
 }
