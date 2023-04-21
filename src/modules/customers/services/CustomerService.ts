@@ -1,7 +1,7 @@
 import AppError from '@shared/errors/AppError';
 import { StatusCodes } from 'http-status-codes';
 import Customer from '../entities/Customer';
-import { CustomerRepository } from '../repositories/CustomerRepository';
+import CustomerRepository from '../repositories/CustomerRepository';
 
 interface IRequest {
   name: string;
@@ -13,8 +13,16 @@ interface IRequestUpdate extends IRequest {
 }
 
 class CustomerService {
+  private customerRepository: CustomerRepository;
+
+  constructor() {
+    this.customerRepository = new CustomerRepository();
+  }
+
   public async create({ name, email }: IRequest): Promise<Customer> {
-    const customerEmailExists = await CustomerRepository.findByEmail(email);
+    const customerEmailExists = await this.customerRepository.findByEmail(
+      email,
+    );
 
     if (customerEmailExists) {
       throw new AppError(
@@ -23,24 +31,24 @@ class CustomerService {
       );
     }
 
-    const customer = CustomerRepository.create({
+    const customer = await this.customerRepository.create({
       name,
       email,
     });
 
-    await CustomerRepository.save(customer);
+    await this.customerRepository.save(customer);
 
     return customer;
   }
 
   public async index(): Promise<Customer[]> {
-    const customer = await CustomerRepository.find();
+    const customer = await this.customerRepository.find();
 
     return customer;
   }
 
   public async show(id: string): Promise<Customer> {
-    const customer = await CustomerRepository.findById(id);
+    const customer = await this.customerRepository.findById(id);
 
     if (!customer) {
       throw new AppError('Customer not found.', StatusCodes.NOT_FOUND);
@@ -50,13 +58,13 @@ class CustomerService {
   }
 
   public async update({ id, name, email }: IRequestUpdate): Promise<Customer> {
-    const customer = await CustomerRepository.findOneBy({ id });
+    const customer = await this.customerRepository.findOneBy(id);
 
     if (!customer) {
       throw new AppError('Customer not found.', StatusCodes.NOT_FOUND);
     }
 
-    const customerExists = await CustomerRepository.findByEmail(email);
+    const customerExists = await this.customerRepository.findByEmail(email);
 
     if (customerExists && email !== customer.email) {
       throw new AppError(
@@ -68,19 +76,19 @@ class CustomerService {
     customer.name = name;
     customer.email = email;
 
-    await CustomerRepository.save(customer);
+    await this.customerRepository.save(customer);
 
     return customer;
   }
 
   public async delete(id: string): Promise<void> {
-    const customer = await CustomerRepository.findOneBy({ id });
+    const customer = await this.customerRepository.findOneBy(id);
 
     if (!customer) {
       throw new AppError('Customer not found.', StatusCodes.NOT_FOUND);
     }
 
-    await CustomerRepository.remove(customer);
+    await this.customerRepository.remove(customer);
   }
 }
 
