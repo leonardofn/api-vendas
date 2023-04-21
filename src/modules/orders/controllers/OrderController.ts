@@ -28,6 +28,6 @@ export default class OrderController {
 
     const order = await this.orderService.create({ customer_id, products });
 
-    return response.json(order);
+    return response.json(instanceToInstance(order));
   };
 }
