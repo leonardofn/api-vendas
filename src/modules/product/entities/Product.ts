@@ -1,4 +1,3 @@
-import OrdersProducts from '@modules/orders/entities/OrdersProducts';
 import {
   Column,
   CreateDateColumn,
@@ -8,6 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import ColumnDecimalTransformer from '../../../shared/transformers/ColumnDecimalTransformer';
+import OrdersProducts from '../../orders/entities/OrdersProducts';
 
 @Entity('products')
 class Product {

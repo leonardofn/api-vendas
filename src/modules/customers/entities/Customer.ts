@@ -1,4 +1,3 @@
-import Order from '@modules/orders/entities/Order';
 import {
   Column,
   CreateDateColumn,
@@ -7,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import Order from '../../orders/entities/Order';
 
 @Entity('customers')
 class Customer {

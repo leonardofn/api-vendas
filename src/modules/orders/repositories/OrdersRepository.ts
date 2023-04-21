@@ -1,5 +1,5 @@
 import { AppDataSource } from '@config/db.config';
-import Customer from '@modules/customers/entities/Customer';
+import Customer from '../../customers/entities/Customer';
 import Order from '../entities/Order';
 import OrdersProducts from '../entities/OrdersProducts';
 
