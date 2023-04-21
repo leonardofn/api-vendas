@@ -1,3 +1,4 @@
+import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
 import OrderService from '../services/OrderService';
 
@@ -16,7 +17,7 @@ export default class OrderController {
 
     const order = await this.orderService.show(id);
 
-    return response.json(order);
+    return response.json(instanceToInstance(order));
   };
 
   public create = async (

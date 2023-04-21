@@ -1,6 +1,7 @@
 import { AppDataSource } from '@config/db.config';
 import Customer from '@modules/customers/entities/Customer';
 import Order from '../entities/Order';
+import OrdersProducts from '../entities/OrdersProducts';
 
 interface IProduct {
   product_id: string;
@@ -19,19 +20,20 @@ export const OrdersRepository = AppDataSource.getRepository(Order).extend({
       id,
     });
 
-    if (!order) {
-      return null;
-    }
+    if (!order) return null;
 
-    order.order_products = await this.createQueryBuilder()
-      .relation(Order, 'order_products')
-      .of(order)
-      .loadMany();
-
-    order.customer = await this.createQueryBuilder()
+    const customer = await this.createQueryBuilder()
       .relation(Order, 'customer')
       .of(order)
-      .loadOne();
+      .loadOne<Customer>();
+
+    const orderProducts = await this.createQueryBuilder()
+      .relation(Order, 'order_products')
+      .of(order)
+      .loadMany<OrdersProducts>();
+
+    order.customer = customer as Customer;
+    order.order_products = orderProducts;
 
     return order;
   },

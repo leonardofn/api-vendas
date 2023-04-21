@@ -1,4 +1,5 @@
 import Customer from '@modules/customers/entities/Customer';
+import { Expose } from 'class-transformer';
 import {
   CreateDateColumn,
   Entity,
@@ -23,8 +24,9 @@ class Order {
 
   @ManyToOne(() => Customer)
   @JoinColumn({ name: 'customer_id' })
-  customer: Customer | undefined;
+  customer: Customer;
 
+  @Expose({ name: 'products' })
   @OneToMany(() => OrdersProducts, order_products => order_products.order, {
     cascade: true,
   })

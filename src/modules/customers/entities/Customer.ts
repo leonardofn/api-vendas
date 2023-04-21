@@ -1,7 +1,9 @@
+import Order from '@modules/orders/entities/Order';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -22,6 +24,11 @@ class Customer {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  @OneToMany(() => Order, order => order.customer, {
+    cascade: true,
+  })
+  orders: Order[];
 }
 
 export default Customer;
