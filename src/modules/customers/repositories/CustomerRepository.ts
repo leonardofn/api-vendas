@@ -5,66 +5,72 @@ import { ICreateCustomer } from '../models/create-customer.model';
 import { ICustomerRepository } from './../models/customer-repository.model';
 
 class CustomerRepository implements ICustomerRepository {
-  private customerRepository: Repository<Customer>;
+  private ormRepository: Repository<Customer>;
 
   constructor() {
-    this.customerRepository = AppDataSource.getRepository(Customer);
+    this.ormRepository = AppDataSource.getRepository(Customer);
   }
 
   public async create({ name, email }: ICreateCustomer): Promise<Customer> {
-    const customer = this.customerRepository.create({
+    const customer = this.ormRepository.create({
       name,
       email,
     });
 
-    await this.customerRepository.save(customer);
+    await this.ormRepository.save(customer);
 
     return customer;
   }
 
   public async save(customer: Customer): Promise<Customer> {
-    await this.customerRepository.save(customer);
+    await this.ormRepository.save(customer);
 
     return customer;
   }
 
   public async remove(customer: Customer): Promise<Customer> {
-    await this.customerRepository.remove(customer);
+    await this.ormRepository.remove(customer);
 
     return customer;
   }
 
   public async find(): Promise<Customer[]> {
-    const customer = await this.customerRepository.find();
+    const customer = await this.ormRepository.find();
 
     return customer;
   }
 
   public async findOneBy(id: string): Promise<Customer | null> {
-    const customer = await this.customerRepository.findOneBy({ id });
+    const customer = await this.ormRepository.findOneBy({ id });
 
     return customer;
   }
 
   public async findByName(name: string): Promise<Customer | null> {
-    return this.customerRepository
+    const customer = this.ormRepository
       .createQueryBuilder('customer')
       .where('customer.name = :name', { name })
       .getOne();
+
+    return customer;
   }
 
   public async findById(id: string): Promise<Customer | null> {
-    return this.customerRepository
+    const customer = this.ormRepository
       .createQueryBuilder('customer')
       .where('customer.id = :id', { id })
       .getOne();
+
+    return customer;
   }
 
   public async findByEmail(email: string): Promise<Customer | null> {
-    return this.customerRepository
+    const customer = this.ormRepository
       .createQueryBuilder('customer')
       .where('customer.email = :email', { email })
       .getOne();
+
+    return customer;
   }
 }
 
