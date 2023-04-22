@@ -1,25 +1,19 @@
 import AppError from '@shared/errors/AppError';
 import { StatusCodes } from 'http-status-codes';
-import Customer from '../entities/Customer';
-import CustomerRepository from '../repositories/CustomerRepository';
+import { inject, injectable } from 'tsyringe';
+import { ICreateCustomer } from '../models/create-customer.model';
+import { ICustomerRepository } from '../models/customer-repository.model';
+import { ICustomer } from '../models/customer.model';
+import { IUpdateCustomer } from '../models/update-customer.model';
 
-interface IRequest {
-  name: string;
-  email: string;
-}
-
-interface IRequestUpdate extends IRequest {
-  id: string;
-}
-
+@injectable()
 class CustomerService {
-  private customerRepository: CustomerRepository;
+  constructor(
+    @inject('CustomerRepository')
+    private customerRepository: ICustomerRepository,
+  ) {}
 
-  constructor() {
-    this.customerRepository = new CustomerRepository();
-  }
-
-  public async create({ name, email }: IRequest): Promise<Customer> {
+  public async create({ name, email }: ICreateCustomer): Promise<ICustomer> {
     const customerEmailExists = await this.customerRepository.findByEmail(
       email,
     );
@@ -36,18 +30,16 @@ class CustomerService {
       email,
     });
 
-    await this.customerRepository.save(customer);
-
     return customer;
   }
 
-  public async index(): Promise<Customer[]> {
+  public async index(): Promise<ICustomer[]> {
     const customer = await this.customerRepository.find();
 
     return customer;
   }
 
-  public async show(id: string): Promise<Customer> {
+  public async show(id: string): Promise<ICustomer> {
     const customer = await this.customerRepository.findById(id);
 
     if (!customer) {
@@ -57,7 +49,11 @@ class CustomerService {
     return customer;
   }
 
-  public async update({ id, name, email }: IRequestUpdate): Promise<Customer> {
+  public async update({
+    id,
+    name,
+    email,
+  }: IUpdateCustomer): Promise<ICustomer> {
     const customer = await this.customerRepository.findOneBy(id);
 
     if (!customer) {

@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 import CustomerService from '../services/CustomerService';
 
 export default class CustomerController {
   private customerService: CustomerService;
 
   constructor() {
-    this.customerService = new CustomerService();
+    this.customerService = container.resolve(CustomerService);
   }
 
   public index = async (
