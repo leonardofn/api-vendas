@@ -1,12 +1,13 @@
 import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 import OrderService from '../services/OrderService';
 
 export default class OrderController {
   private orderService: OrderService;
 
   constructor() {
-    this.orderService = new OrderService();
+    this.orderService = container.resolve(OrderService);
   }
 
   public show = async (

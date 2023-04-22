@@ -1,23 +1,29 @@
-import { CustomerRepository } from '@modules/customers/repositories/CustomerRepository';
-import { OrdersRepository } from '@modules/orders/repositories/OrdersRepository';
-import { ProductRepository } from '@modules/product/repositories/ProductRepository';
+import { ICustomerRepository } from '@modules/customers/models/customer-repository.model';
+import { IProductRepository } from '@modules/product/models/product-repository.model';
+import { IUpdateStockProduct } from '@modules/product/models/update-stock-product.model';
 import AppError from '@shared/errors/AppError';
 import { StatusCodes } from 'http-status-codes';
-import Order from '../entities/Order';
+import { inject, injectable } from 'tsyringe';
+import { IOrderRepository } from '../models/order-repository.model';
+import { IOrder } from '../models/order.model';
+import { IRequestCreateOrder } from '../models/request-create-order.model';
 
-interface IProduct {
-  id: string;
-  quantity: number;
-}
-
-interface IRequest {
-  customer_id: string;
-  products: IProduct[];
-}
-
+@injectable()
 class OrderService {
-  public async create({ customer_id, products }: IRequest): Promise<Order> {
-    const customerExists = await CustomerRepository.findById(customer_id);
+  constructor(
+    @inject('OrderRepository')
+    private orderRepository: IOrderRepository,
+    @inject('CustomerRepository')
+    private customerRepository: ICustomerRepository,
+    @inject('ProductRepository')
+    private productRepository: IProductRepository,
+  ) {}
+
+  public async create({
+    customer_id,
+    products,
+  }: IRequestCreateOrder): Promise<IOrder> {
+    const customerExists = await this.customerRepository.findById(customer_id);
 
     if (!customerExists) {
       throw new AppError(
@@ -25,7 +31,8 @@ class OrderService {
         StatusCodes.NOT_FOUND,
       );
     }
-    const foundProducts = await ProductRepository.findAllByIds(products);
+
+    const foundProducts = await this.productRepository.findAllByIds(products);
 
     if (foundProducts.length === 0) {
       throw new AppError(
@@ -34,7 +41,7 @@ class OrderService {
       );
     }
 
-    const foundProductsIds = foundProducts.map(products => products.id);
+    const foundProductsIds = foundProducts.map(product => product.id);
 
     const checkInexistentProducts = products.filter(
       product => !foundProductsIds.includes(product.id),
@@ -42,7 +49,7 @@ class OrderService {
 
     if (checkInexistentProducts.length > 0) {
       throw new AppError(
-        `Could not find any product ${checkInexistentProducts[0].id}.`,
+        `Could not find any product ${checkInexistentProducts[0].id}`,
         StatusCodes.NOT_FOUND,
       );
     }
@@ -66,27 +73,29 @@ class OrderService {
       price: foundProducts.find(p => p.id === product.id)?.price ?? 0,
     }));
 
-    const order = await OrdersRepository.createOrder({
+    const order = await this.orderRepository.create({
       customer: customerExists,
       products: serializedProducts,
     });
 
     const { order_products } = order;
 
-    const updatedProductQuantity = order_products.map(product => ({
-      id: product.product_id,
-      quantity:
-        foundProducts.filter(p => p.id === product.product_id)[0].quantity -
-        product.quantity,
-    }));
+    const updatedProductQuantity = order_products.map<IUpdateStockProduct>(
+      product => ({
+        id: product.product_id,
+        quantity:
+          foundProducts.filter(p => p.id === product.product_id)[0].quantity -
+          product.quantity,
+      }),
+    );
 
-    await ProductRepository.save(updatedProductQuantity);
+    await this.productRepository.updateStock(updatedProductQuantity);
 
     return order;
   }
 
-  public async show(id: string) {
-    const order = await OrdersRepository.findById(id);
+  public async show(id: string): Promise<IOrder> {
+    const order = await this.orderRepository.findById(id);
 
     if (!order) {
       throw new AppError('Order not found.', StatusCodes.NOT_FOUND);
