@@ -2,25 +2,30 @@ import RedisCache from '@shared/cache/CacheRedis';
 import { RedisKeys } from '@shared/cache/redis-keys';
 import AppError from '@shared/errors/AppError';
 import { StatusCodes } from 'http-status-codes';
-import Product from '../entities/Product';
-import { ProductRepository } from './../repositories/ProductRepository';
+import { inject, injectable } from 'tsyringe';
+import { ICreateProduct } from '../models/create-product.model';
+import { IProductId } from '../models/product-id.model';
+import { IProductRepository } from '../models/product-repository.model';
+import { IProduct } from '../models/product.model';
+import { IUpdateProduct } from '../models/update-product.model';
 
-interface IRequest {
-  name: string;
-  price: number;
-  quantity: number;
-  id?: string;
-}
-
+@injectable()
 class ProductService {
   private redisCache: RedisCache;
 
-  constructor() {
+  constructor(
+    @inject('ProductRepository')
+    private productRepository: IProductRepository,
+  ) {
     this.redisCache = new RedisCache();
   }
 
-  public async create({ name, price, quantity }: IRequest): Promise<Product> {
-    const productExists = await ProductRepository.findByName(name);
+  public async create({
+    name,
+    price,
+    quantity,
+  }: ICreateProduct): Promise<IProduct> {
+    const productExists = await this.productRepository.findByName(name);
 
     if (productExists) {
       throw new AppError(
@@ -29,7 +34,7 @@ class ProductService {
       );
     }
 
-    const product = ProductRepository.create({
+    const product = await this.productRepository.create({
       name,
       price,
       quantity,
@@ -37,23 +42,27 @@ class ProductService {
 
     await this.redisCache.invalidate(RedisKeys.PRODUCT_LIST);
 
-    await ProductRepository.save(product);
+    await this.productRepository.save(product);
 
     return product;
   }
 
-  public async index(): Promise<Product[]> {
-    const products =
-      (await this.redisCache.recover<Product[]>(RedisKeys.PRODUCT_LIST)) ||
-      (await ProductRepository.find());
+  public async index(): Promise<IProduct[]> {
+    let products = await this.redisCache.recover<IProduct[]>(
+      'api-vendas-PRODUCT_LIST',
+    );
 
-    await this.redisCache.save<Product[]>(RedisKeys.PRODUCT_LIST, products);
+    if (!products) {
+      products = await this.productRepository.findAll();
+
+      await this.redisCache.save('api-vendas-PRODUCT_LIST', products);
+    }
 
     return products;
   }
 
-  public async findById(id: string): Promise<Product> {
-    const product = await ProductRepository.findOneBy({ id });
+  public async findById({ id }: IProductId): Promise<IProduct> {
+    const product = await this.productRepository.findById(id);
 
     if (!product) {
       throw new AppError('Product not found.', StatusCodes.NOT_FOUND);
@@ -67,14 +76,14 @@ class ProductService {
     name,
     price,
     quantity,
-  }: IRequest): Promise<Product> {
-    const product = await ProductRepository.findOneBy({ id });
+  }: IUpdateProduct): Promise<IProduct> {
+    const product = await this.productRepository.findById(id);
 
     if (!product) {
       throw new AppError('Product not found.', StatusCodes.NOT_FOUND);
     }
 
-    const productExists = await ProductRepository.findByName(name);
+    const productExists = await this.productRepository.findByName(name);
 
     if (productExists && name !== product.name) {
       throw new AppError(
@@ -89,13 +98,13 @@ class ProductService {
     product.price = price;
     product.quantity = quantity;
 
-    await ProductRepository.save(product);
+    await this.productRepository.save(product);
 
     return product;
   }
 
-  public async delete(id: string): Promise<void> {
-    const product = await ProductRepository.findOneBy({ id });
+  public async delete({ id }: IProductId): Promise<void> {
+    const product = await this.productRepository.findById(id);
 
     if (!product) {
       throw new AppError('Product not found.', StatusCodes.NOT_FOUND);
@@ -103,7 +112,7 @@ class ProductService {
 
     await this.redisCache.invalidate(RedisKeys.PRODUCT_LIST);
 
-    await ProductRepository.remove(product);
+    await this.productRepository.remove(product);
   }
 }
 

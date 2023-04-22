@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 import ProductService from '../services/ProductService';
 
 export default class ProductsController {
   private productService: ProductService;
 
   constructor() {
-    this.productService = new ProductService();
+    this.productService = container.resolve(ProductService);
   }
 
   public index = async (
@@ -23,7 +24,7 @@ export default class ProductsController {
   ): Promise<Response> => {
     const { id } = request.params;
 
-    const showProduct = await this.productService.findById(id);
+    const showProduct = await this.productService.findById({ id });
 
     return response.json(showProduct);
   };
@@ -62,7 +63,7 @@ export default class ProductsController {
   ): Promise<Response> => {
     const { id } = request.params;
 
-    await this.productService.delete(id);
+    await this.productService.delete({ id });
 
     return response.json([]);
   };
