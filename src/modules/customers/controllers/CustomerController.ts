@@ -1,3 +1,4 @@
+import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
 import { container } from 'tsyringe';
 import CustomerService from '../services/CustomerService';
@@ -11,7 +12,7 @@ export default class CustomerController {
 
   public index = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const listCustomers = await this.customerService.index();
 
@@ -20,18 +21,18 @@ export default class CustomerController {
 
   public show = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const { id } = request.params;
 
     const showCustomer = await this.customerService.show(id);
 
-    return response.json(showCustomer);
+    return response.json(instanceToInstance(showCustomer));
   };
 
   public create = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const { name, email } = request.body;
 
@@ -45,7 +46,7 @@ export default class CustomerController {
 
   public update = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const { name, email } = request.body;
     const { id } = request.params;
@@ -61,7 +62,7 @@ export default class CustomerController {
 
   public delete = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const { id } = request.params;
 

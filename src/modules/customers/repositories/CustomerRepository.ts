@@ -46,6 +46,20 @@ class CustomerRepository implements ICustomerRepository {
     return customer;
   }
 
+  public async findByIdWithProducts(id: string): Promise<Customer | null> {
+    const customer = await this.ormRepository.findOne({
+      relations: ['orders.order_products.product'],
+      where: {
+        id,
+      },
+      order: {
+        created_at: 'DESC',
+      },
+    });
+
+    return customer;
+  }
+
   public async findByName(name: string): Promise<Customer | null> {
     const customer = this.ormRepository
       .createQueryBuilder('customer')

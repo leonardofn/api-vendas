@@ -10,18 +10,18 @@ import { IUpdateCustomer } from '../models/update-customer.model';
 class CustomerService {
   constructor(
     @inject('CustomerRepository')
-    private customerRepository: ICustomerRepository,
+    private customerRepository: ICustomerRepository
   ) {}
 
   public async create({ name, email }: ICreateCustomer): Promise<ICustomer> {
     const customerEmailExists = await this.customerRepository.findByEmail(
-      email,
+      email
     );
 
     if (customerEmailExists) {
       throw new AppError(
         'There is already one customer with is email.',
-        StatusCodes.CONFLICT,
+        StatusCodes.CONFLICT
       );
     }
 
@@ -39,8 +39,8 @@ class CustomerService {
     return customer;
   }
 
-  public async show(id: string): Promise<ICustomer> {
-    const customer = await this.customerRepository.findById(id);
+  public async show(id: string): Promise<ICustomer | null> {
+    const customer = await this.customerRepository.findByIdWithProducts(id);
 
     if (!customer) {
       throw new AppError('Customer not found.', StatusCodes.NOT_FOUND);
@@ -65,7 +65,7 @@ class CustomerService {
     if (customerExists && email !== customer.email) {
       throw new AppError(
         'There is already one customer with is email.',
-        StatusCodes.CONFLICT,
+        StatusCodes.CONFLICT
       );
     }
 

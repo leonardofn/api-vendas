@@ -22,7 +22,7 @@ class Order {
   @UpdateDateColumn()
   updated_at: Date;
 
-  @ManyToOne(() => Customer)
+  @ManyToOne(() => Customer, customer => customer.orders)
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
