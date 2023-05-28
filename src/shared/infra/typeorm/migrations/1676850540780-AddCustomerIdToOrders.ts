@@ -13,7 +13,7 @@ export class AddCustomerIdToOrders1676850540780 implements MigrationInterface {
         name: 'customer_id',
         type: 'uuid',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -24,7 +24,7 @@ export class AddCustomerIdToOrders1676850540780 implements MigrationInterface {
         referencedTableName: 'customers',
         referencedColumnNames: ['id'],
         onDelete: 'SET NULL',
-      }),
+      })
     );
   }
 

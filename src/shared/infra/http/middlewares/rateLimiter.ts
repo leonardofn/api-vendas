@@ -7,7 +7,7 @@ import { RateLimiterRedis } from 'rate-limiter-flexible';
 export default async function rateLimiter(
   request: Request,
   response: Response,
-  next: NextFunction,
+  next: NextFunction
 ): Promise<void> {
   try {
     const redisClient = new Redis({

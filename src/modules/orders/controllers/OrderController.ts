@@ -12,7 +12,7 @@ export default class OrderController {
 
   public show = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const { id } = request.params;
 
@@ -23,7 +23,7 @@ export default class OrderController {
 
   public create = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const { customer_id, products } = request.body;
 

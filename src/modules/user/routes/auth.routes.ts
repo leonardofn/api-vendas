@@ -13,7 +13,7 @@ userAuthRouter.post(
       password: Joi.string().required(),
     },
   }),
-  userAuthController.execute,
+  userAuthController.execute
 );
 
 export default userAuthRouter;

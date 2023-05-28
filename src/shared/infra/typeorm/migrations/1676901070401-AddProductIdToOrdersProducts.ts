@@ -15,7 +15,7 @@ export class AddProductIdToOrdersProducts1676901070401
         name: 'product_id',
         type: 'uuid',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -26,14 +26,14 @@ export class AddProductIdToOrdersProducts1676901070401
         referencedTableName: 'products',
         referencedColumnNames: ['id'],
         onDelete: 'SET NULL',
-      }),
+      })
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.dropForeignKey(
       'orders_products',
-      'OrdersProductsProduct',
+      'OrdersProductsProduct'
     );
     await queryRunner.dropColumn('orders_products', 'product_id');
   }

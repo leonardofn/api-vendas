@@ -27,7 +27,7 @@ profileRouter.put(
         }),
     },
   }),
-  profileController.update,
+  profileController.update
 );
 
 export default profileRouter;

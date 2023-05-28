@@ -15,7 +15,7 @@ export class AddOrderIdOrdersProducts1676900533337
         name: 'order_id',
         type: 'uuid',
         isNullable: true,
-      }),
+      })
     );
 
     await queryRunner.createForeignKey(
@@ -26,7 +26,7 @@ export class AddOrderIdOrdersProducts1676900533337
         referencedTableName: 'orders',
         referencedColumnNames: ['id'],
         onDelete: 'SET NULL',
-      }),
+      })
     );
   }
 

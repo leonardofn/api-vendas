@@ -17,7 +17,7 @@ customerRouter.get(
       id: Joi.string().uuid().required(),
     },
   }),
-  customerController.show,
+  customerController.show
 );
 
 customerRouter.post(
@@ -28,7 +28,7 @@ customerRouter.post(
       email: Joi.string().email().required(),
     },
   }),
-  customerController.create,
+  customerController.create
 );
 
 customerRouter.put(
@@ -42,7 +42,7 @@ customerRouter.put(
       email: Joi.string().email().required(),
     },
   }),
-  customerController.update,
+  customerController.update
 );
 
 customerRouter.delete(
@@ -52,7 +52,7 @@ customerRouter.delete(
       id: Joi.string().uuid().required(),
     },
   }),
-  customerController.delete,
+  customerController.delete
 );
 
 export default customerRouter;
