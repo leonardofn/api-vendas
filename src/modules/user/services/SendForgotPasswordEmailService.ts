@@ -7,10 +7,6 @@ import { ISendForgotPasswordEmail } from '../models/forgot.model';
 import { IUserRepository } from '../models/user-repository.model';
 import { IUserTokensRepository } from '../models/user-tokens-repository.model';
 
-interface IRequest {
-  email: string;
-}
-
 @injectable()
 class SendForgotPasswordEmailService {
   constructor(
