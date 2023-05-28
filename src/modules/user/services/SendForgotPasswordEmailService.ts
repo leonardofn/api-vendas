@@ -2,28 +2,39 @@ import EtherealMail from '@config/mail/EtherealMail';
 import AppError from '@shared/errors/AppError';
 import { StatusCodes } from 'http-status-codes';
 import path from 'path';
-import { UserRepository } from './../repositories/UserRepository';
-import { UserTokenRepository } from './../repositories/UserTokenRepository';
+import { inject, injectable } from 'tsyringe';
+import { ISendForgotPasswordEmail } from '../models/forgot.model';
+import { IUserRepository } from '../models/user-repository.model';
+import { IUserTokensRepository } from '../models/user-tokens-repository.model';
 
 interface IRequest {
   email: string;
 }
 
+@injectable()
 class SendForgotPasswordEmailService {
-  public async execute({ email }: IRequest): Promise<void> {
-    const user = await UserRepository.findByEmail(email);
+  constructor(
+    @inject('UserRepository')
+    private userRepository: IUserRepository,
+
+    @inject('UserTokensRepository')
+    private userTokensRepository: IUserTokensRepository
+  ) {}
+
+  public async execute({ email }: ISendForgotPasswordEmail): Promise<void> {
+    const user = await this.userRepository.findByEmail(email);
 
     if (!user) {
       throw new AppError('User does not exists.', StatusCodes.NOT_FOUND);
     }
 
-    const { token } = await UserTokenRepository.generate(user.id);
+    const { token } = await this.userTokensRepository.generate(user.id);
 
     const forgotPasswordTemplate = path.resolve(
       __dirname,
       '..',
       'views',
-      'forgot-password.hbs',
+      'forgot-password.hbs'
     );
 
     await EtherealMail.sendMail({

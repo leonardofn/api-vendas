@@ -1,22 +1,53 @@
 import { AppDataSource } from '@config/db.config';
+import { Repository } from 'typeorm';
 import User from '../entities/User';
+import { ICreateUser } from '../models/create-user.model';
+import { IUserRepository } from '../models/user-repository.model';
 
-export const UserRepository = AppDataSource.getRepository(User).extend({
-  async findByName(name: string): Promise<User | null> {
-    return this.createQueryBuilder('user')
-      .where('user.name = :name', { name })
-      .getOne();
-  },
+class UserRepository implements IUserRepository {
+  private ormRepository: Repository<User>;
 
-  async findById(id: string): Promise<User | null> {
-    return this.createQueryBuilder('user')
-      .where('user.id = :id', { id })
-      .getOne();
-  },
+  constructor() {
+    this.ormRepository = AppDataSource.getRepository(User);
+  }
 
-  async findByEmail(email: string): Promise<User | null> {
-    return this.createQueryBuilder('user')
-      .where('user.email = :email', { email })
-      .getOne();
-  },
-});
+  public async create({ name, email, password }: ICreateUser): Promise<User> {
+    const user = this.ormRepository.create({ name, email, password });
+
+    await this.ormRepository.save(user);
+
+    return user;
+  }
+
+  public async save(user: User): Promise<User> {
+    await this.ormRepository.save(user);
+
+    return user;
+  }
+
+  public async findAll(): Promise<User[]> {
+    const users = await this.ormRepository.find();
+
+    return users;
+  }
+
+  public async findByName(name: string): Promise<User | null> {
+    const user = await this.ormRepository.findOneBy({ name });
+
+    return user;
+  }
+
+  public async findById(id: string): Promise<User | null> {
+    const user = await this.ormRepository.findOneBy({ id });
+
+    return user;
+  }
+
+  public async findByEmail(email: string): Promise<User | null> {
+    const user = await this.ormRepository.findOneBy({ email });
+
+    return user;
+  }
+}
+
+export default UserRepository;

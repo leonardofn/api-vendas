@@ -2,7 +2,6 @@ import { AppDataSource } from '@config/db.config';
 import { In, Repository } from 'typeorm';
 import Product from '../entities/Product';
 import { ICreateProduct } from '../models/create-product.model';
-import { IProductId } from '../models/product-id.model';
 import { IProductRepository } from '../models/product-repository.model';
 import { IUpdateStockProduct } from '../models/update-stock-product.model';
 
@@ -16,9 +15,9 @@ class ProductRepository implements IProductRepository {
   public async create({
     name,
     price,
-    quantity,
+    stock_quantity,
   }: ICreateProduct): Promise<Product> {
-    const product = this.ormRepository.create({ name, price, quantity });
+    const product = this.ormRepository.create({ name, price, stock_quantity });
 
     await this.ormRepository.save(product);
 
@@ -63,12 +62,10 @@ class ProductRepository implements IProductRepository {
     return products;
   }
 
-  public async findAllByIds(products: IProductId[]): Promise<Product[]> {
-    const productIds = products.map(product => product.id);
-
+  public async findAllByIds(productsIds: string[]): Promise<Product[]> {
     const existentProducts = await this.ormRepository.find({
       where: {
-        id: In(productIds),
+        id: In(productsIds),
       },
     });
 

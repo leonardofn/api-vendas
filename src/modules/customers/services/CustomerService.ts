@@ -54,7 +54,7 @@ class CustomerService {
     name,
     email,
   }: IUpdateCustomer): Promise<ICustomer> {
-    const customer = await this.customerRepository.findOneBy(id);
+    const customer = await this.customerRepository.findById(id);
 
     if (!customer) {
       throw new AppError('Customer not found.', StatusCodes.NOT_FOUND);
@@ -78,7 +78,7 @@ class CustomerService {
   }
 
   public async delete(id: string): Promise<void> {
-    const customer = await this.customerRepository.findOneBy(id);
+    const customer = await this.customerRepository.findById(id);
 
     if (!customer) {
       throw new AppError('Customer not found.', StatusCodes.NOT_FOUND);

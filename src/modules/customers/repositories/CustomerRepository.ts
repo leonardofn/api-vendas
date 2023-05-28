@@ -40,8 +40,8 @@ class CustomerRepository implements ICustomerRepository {
     return customer;
   }
 
-  public async findOneBy(id: string): Promise<Customer | null> {
-    const customer = await this.ormRepository.findOneBy({ id });
+  public async findById(id: string): Promise<Customer | null> {
+    const customer = this.ormRepository.findOneBy({ id });
 
     return customer;
   }
@@ -61,28 +61,13 @@ class CustomerRepository implements ICustomerRepository {
   }
 
   public async findByName(name: string): Promise<Customer | null> {
-    const customer = this.ormRepository
-      .createQueryBuilder('customer')
-      .where('customer.name = :name', { name })
-      .getOne();
-
-    return customer;
-  }
-
-  public async findById(id: string): Promise<Customer | null> {
-    const customer = this.ormRepository
-      .createQueryBuilder('customer')
-      .where('customer.id = :id', { id })
-      .getOne();
+    const customer = this.ormRepository.findOneBy({ name });
 
     return customer;
   }
 
   public async findByEmail(email: string): Promise<Customer | null> {
-    const customer = this.ormRepository
-      .createQueryBuilder('customer')
-      .where('customer.email = :email', { email })
-      .getOne();
+    const customer = this.ormRepository.findOneBy({ email });
 
     return customer;
   }

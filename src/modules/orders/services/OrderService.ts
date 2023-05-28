@@ -4,6 +4,7 @@ import { IUpdateStockProduct } from '@modules/product/models/update-stock-produc
 import AppError from '@shared/errors/AppError';
 import { StatusCodes } from 'http-status-codes';
 import { inject, injectable } from 'tsyringe';
+import { ICreateOrderProducts } from '../models/create-order-products.model';
 import { IOrderRepository } from '../models/order-repository.model';
 import { IOrder } from '../models/order.model';
 import { IRequestCreateOrder } from '../models/request-create-order.model';
@@ -16,7 +17,7 @@ class OrderService {
     @inject('CustomerRepository')
     private customerRepository: ICustomerRepository,
     @inject('ProductRepository')
-    private productRepository: IProductRepository,
+    private productRepository: IProductRepository
   ) {}
 
   public async create({
@@ -28,49 +29,52 @@ class OrderService {
     if (!customerExists) {
       throw new AppError(
         'Could not find any customer with the given id.',
-        StatusCodes.NOT_FOUND,
+        StatusCodes.NOT_FOUND
       );
     }
 
-    const foundProducts = await this.productRepository.findAllByIds(products);
+    const productsIds = products.map(product => product.id);
+    const foundProducts = await this.productRepository.findAllByIds(
+      productsIds
+    );
 
     if (foundProducts.length === 0) {
       throw new AppError(
         'Could not find any products with the given ids.',
-        StatusCodes.NOT_FOUND,
+        StatusCodes.NOT_FOUND
       );
     }
 
     const foundProductsIds = foundProducts.map(product => product.id);
 
     const checkInexistentProducts = products.filter(
-      product => !foundProductsIds.includes(product.id),
+      product => !foundProductsIds.includes(product.id)
     );
 
     if (checkInexistentProducts.length > 0) {
       throw new AppError(
         `Could not find any product ${checkInexistentProducts[0].id}`,
-        StatusCodes.NOT_FOUND,
+        StatusCodes.NOT_FOUND
       );
     }
 
     const quantityAvailable = products.filter(
       prodOrder =>
         foundProducts.filter(prodFound => prodFound.id === prodOrder.id)[0]
-          .quantity < prodOrder.quantity,
+          .stock_quantity < prodOrder.quantity
     );
 
     if (quantityAvailable.length > 0) {
       throw new AppError(
         `The quantity ${quantityAvailable[0].quantity} is not available for product ${quantityAvailable[0].id}`,
-        StatusCodes.CONFLICT,
+        StatusCodes.CONFLICT
       );
     }
 
-    const serializedProducts = products.map(product => ({
+    const serializedProducts = products.map<ICreateOrderProducts>(product => ({
       product_id: product.id,
       quantity: product.quantity,
-      price: foundProducts.find(p => p.id === product.id)?.price ?? 0,
+      price: foundProducts.find(p => p.id === product.id)?.price ?? -1,
     }));
 
     const order = await this.orderRepository.create({
@@ -79,14 +83,13 @@ class OrderService {
     });
 
     const { order_products } = order;
-
     const updatedProductQuantity = order_products.map<IUpdateStockProduct>(
       product => ({
         id: product.product_id,
-        quantity:
-          foundProducts.filter(p => p.id === product.product_id)[0].quantity -
-          product.quantity,
-      }),
+        stock_quantity:
+          foundProducts.filter(p => p.id === product.product_id)[0]
+            .stock_quantity - product.quantity,
+      })
     );
 
     await this.productRepository.updateStock(updatedProductQuantity);

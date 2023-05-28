@@ -9,10 +9,11 @@ import {
 } from 'typeorm';
 import ColumnDecimalTransformer from '../../../shared/transformers/ColumnDecimalTransformer';
 import Product from '../../product/entities/Product';
+import { IOrderProducts } from '../models/order-products.model';
 import Order from './Order';
 
 @Entity('orders_products')
-class OrdersProducts {
+class OrdersProducts implements IOrderProducts {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

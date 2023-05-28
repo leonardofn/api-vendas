@@ -2,23 +2,29 @@ import AppError from '@shared/errors/AppError';
 import { hash } from 'bcryptjs';
 import { addHours, isAfter } from 'date-fns';
 import { StatusCodes } from 'http-status-codes';
-import { UserRepository } from '../repositories/UserRepository';
-import { UserTokenRepository } from '../repositories/UserTokenRepository';
+import { inject, injectable } from 'tsyringe';
+import { IResetPassword } from '../models/reset-password.model';
+import { IUserRepository } from '../models/user-repository.model';
+import { IUserTokensRepository } from '../models/user-tokens-repository.model';
 
-interface IRequest {
-  token: string;
-  password: string;
-}
-
+@injectable()
 class ResetPasswordService {
-  public async execute({ token, password }: IRequest): Promise<void> {
-    const userToken = await UserTokenRepository.findByToken(token);
+  constructor(
+    @inject('UserRepository')
+    private userRepository: IUserRepository,
+
+    @inject('UserTokensRepository')
+    private userTokensRepository: IUserTokensRepository
+  ) {}
+
+  public async execute({ token, password }: IResetPassword): Promise<void> {
+    const userToken = await this.userTokensRepository.findByToken(token);
 
     if (!userToken) {
       throw new AppError('User Token does not exists.', StatusCodes.NOT_FOUND);
     }
 
-    const user = await UserRepository.findById(userToken.user_id);
+    const user = await this.userRepository.findById(userToken.user_id);
 
     if (!user) {
       throw new AppError('User does not exists.', StatusCodes.NOT_FOUND);
@@ -33,7 +39,7 @@ class ResetPasswordService {
 
     user.password = await hash(password, 8);
 
-    await UserRepository.save(user);
+    await this.userRepository.save(user);
   }
 }
 

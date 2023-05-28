@@ -13,7 +13,7 @@ interface ITokenPayload {
 export default function isAuthenticated(
   request: Request,
   response: Response,
-  next: NextFunction,
+  next: NextFunction
 ): void {
   const authHeader = request.headers.authorization;
 
@@ -24,7 +24,8 @@ export default function isAuthenticated(
   const [, token] = authHeader.split(' ');
 
   try {
-    const decodedToken = verify(token, authConfig.jwt.secret);
+    const secret = authConfig.jwt.secret ?? '';
+    const decodedToken = verify(token, secret);
     const { sub } = decodedToken as ITokenPayload;
 
     request.user = {

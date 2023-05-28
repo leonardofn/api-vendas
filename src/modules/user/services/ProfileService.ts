@@ -1,20 +1,21 @@
 import AppError from '@shared/errors/AppError';
 import { compare, hash } from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
-import User from '../entities/User';
-import { UserRepository } from '../repositories/UserRepository';
+import { inject, injectable } from 'tsyringe';
+import { IShowUser } from '../models/show-user.model';
+import { IUpdateProfile } from '../models/update-profile.model';
+import { IUserRepository } from '../models/user-repository.model';
+import { IUser } from '../models/user.model';
 
-interface IRequest {
-  user_id: string;
-  name: string;
-  email: string;
-  password?: string;
-  old_password?: string;
-}
-
+@injectable()
 class ProfileService {
-  public async show(user_id: string): Promise<User> {
-    const user = await UserRepository.findById(user_id);
+  constructor(
+    @inject('UserRepository')
+    private userRepository: IUserRepository
+  ) {}
+
+  public async show({ user_id }: IShowUser): Promise<IUser> {
+    const user = await this.userRepository.findById(user_id);
 
     if (!user) {
       throw new AppError('User not found.', StatusCodes.NOT_FOUND);
@@ -29,19 +30,19 @@ class ProfileService {
     email,
     password,
     old_password,
-  }: IRequest): Promise<User> {
-    const user = await UserRepository.findById(user_id);
+  }: IUpdateProfile): Promise<IUser> {
+    const user = await this.userRepository.findById(user_id);
 
     if (!user) {
       throw new AppError('User not found.', StatusCodes.NOT_FOUND);
     }
 
-    const userEmail = await UserRepository.findByEmail(email);
+    const userEmail = await this.userRepository.findByEmail(email);
 
     if (userEmail && userEmail.id !== user_id) {
       throw new AppError(
         'There is already another user using this email address.',
-        StatusCodes.CONFLICT,
+        StatusCodes.CONFLICT
       );
     }
 
@@ -62,7 +63,7 @@ class ProfileService {
     user.name = name;
     user.email = email;
 
-    await UserRepository.save(user);
+    await this.userRepository.save(user);
 
     return user;
   }

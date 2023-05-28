@@ -1,22 +1,30 @@
 import { AppDataSource } from '@config/db.config';
+import { Repository } from 'typeorm';
 import UserToken from '../entities/UserToken';
+import { IUserTokensRepository } from '../models/user-tokens-repository.model';
 
-export const UserTokenRepository = AppDataSource.getRepository(
-  UserToken,
-).extend({
-  async findByToken(token: string): Promise<UserToken | null> {
-    return this.createQueryBuilder('user_token')
-      .where('user_token.token = :token', { token })
-      .getOne();
-  },
+class UserTokensRepository implements IUserTokensRepository {
+  private ormRepository: Repository<UserToken>;
 
-  async generate(user_id: string): Promise<UserToken> {
-    const userToken = this.create({
+  constructor() {
+    this.ormRepository = AppDataSource.getRepository(UserToken);
+  }
+
+  public async findByToken(token: string): Promise<UserToken | null> {
+    const userToken = await this.ormRepository.findOneBy({ token });
+
+    return userToken;
+  }
+
+  public async generate(user_id: string): Promise<UserToken> {
+    const userToken = this.ormRepository.create({
       user_id,
     });
 
-    await this.save(userToken);
+    await this.ormRepository.save(userToken);
 
     return userToken;
-  },
-});
+  }
+}
+
+export default UserTokensRepository;

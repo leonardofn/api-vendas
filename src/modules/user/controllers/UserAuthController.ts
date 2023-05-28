@@ -1,17 +1,18 @@
 import { instanceToInstance } from 'class-transformer';
 import { Request, Response } from 'express';
+import { container } from 'tsyringe';
 import UserAuthService from '../services/UserAuthService';
 
 export default class UserAuthController {
   private userAuthService: UserAuthService;
 
   constructor() {
-    this.userAuthService = new UserAuthService();
+    this.userAuthService = container.resolve(UserAuthService);
   }
 
   public execute = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const { email, password } = request.body;
 

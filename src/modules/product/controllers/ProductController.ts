@@ -11,7 +11,7 @@ export default class ProductsController {
 
   public index = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const listProducts = await this.productService.index();
 
@@ -20,7 +20,7 @@ export default class ProductsController {
 
   public show = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const { id } = request.params;
 
@@ -31,18 +31,22 @@ export default class ProductsController {
 
   public create = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
-    const { name, price, quantity } = request.body;
+    const { name, price, stock_quantity } = request.body;
 
-    const product = await this.productService.create({ name, price, quantity });
+    const product = await this.productService.create({
+      name,
+      price,
+      stock_quantity,
+    });
 
     return response.json(product);
   };
 
   public update = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const { name, price, quantity } = request.body;
     const { id } = request.params;
@@ -59,7 +63,7 @@ export default class ProductsController {
 
   public delete = async (
     request: Request,
-    response: Response,
+    response: Response
   ): Promise<Response> => {
     const { id } = request.params;
 

@@ -8,9 +8,10 @@ import {
 } from 'typeorm';
 import ColumnDecimalTransformer from '../../../shared/transformers/ColumnDecimalTransformer';
 import OrdersProducts from '../../orders/entities/OrdersProducts';
+import { IProduct } from '../models/product.model';
 
 @Entity('products')
-class Product {
+class Product implements IProduct {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -23,7 +24,7 @@ class Product {
   price: number;
 
   @Column('int')
-  quantity: number;
+  stock_quantity: number;
 
   @CreateDateColumn()
   created_at: Date;

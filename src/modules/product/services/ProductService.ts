@@ -15,7 +15,7 @@ class ProductService {
 
   constructor(
     @inject('ProductRepository')
-    private productRepository: IProductRepository,
+    private productRepository: IProductRepository
   ) {
     this.redisCache = new RedisCache();
   }
@@ -23,21 +23,21 @@ class ProductService {
   public async create({
     name,
     price,
-    quantity,
+    stock_quantity,
   }: ICreateProduct): Promise<IProduct> {
     const productExists = await this.productRepository.findByName(name);
 
     if (productExists) {
       throw new AppError(
         'There is already one product with is name.',
-        StatusCodes.CONFLICT,
+        StatusCodes.CONFLICT
       );
     }
 
     const product = await this.productRepository.create({
       name,
       price,
-      quantity,
+      stock_quantity,
     });
 
     await this.redisCache.invalidate(RedisKeys.PRODUCT_LIST);
@@ -49,13 +49,13 @@ class ProductService {
 
   public async index(): Promise<IProduct[]> {
     let products = await this.redisCache.recover<IProduct[]>(
-      'api-vendas-PRODUCT_LIST',
+      RedisKeys.PRODUCT_LIST
     );
 
     if (!products) {
       products = await this.productRepository.findAll();
 
-      await this.redisCache.save('api-vendas-PRODUCT_LIST', products);
+      await this.redisCache.save(RedisKeys.PRODUCT_LIST, products);
     }
 
     return products;
@@ -88,7 +88,7 @@ class ProductService {
     if (productExists && name !== product.name) {
       throw new AppError(
         'There is already one product with is name.',
-        StatusCodes.CONFLICT,
+        StatusCodes.CONFLICT
       );
     }
 
@@ -96,7 +96,7 @@ class ProductService {
 
     product.name = name;
     product.price = price;
-    product.quantity = quantity;
+    product.stock_quantity = quantity;
 
     await this.productRepository.save(product);
 

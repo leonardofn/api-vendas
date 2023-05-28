@@ -2,21 +2,24 @@ import AppError from '@shared/errors/AppError';
 import fs from 'fs';
 import { StatusCodes } from 'http-status-codes';
 import path from 'path';
+import { inject, injectable } from 'tsyringe';
 import uploadConfig from '../../../config/upload';
-import User from '../entities/User';
-import { UserRepository } from '../repositories/UserRepository';
+import { IUpdateUserAvatar } from '../models/update-user-avatar.model';
+import { IUserRepository } from '../models/user-repository.model';
+import { IUser } from '../models/user.model';
 
-interface IRequest {
-  user_id: string;
-  avatarFileName: string;
-}
-
+@injectable()
 class UserAvatarService {
+  constructor(
+    @inject('UserRepository')
+    private userRepository: IUserRepository
+  ) {}
+
   public async uploadAvatar({
     user_id,
-    avatarFileName,
-  }: IRequest): Promise<User> {
-    const user = await UserRepository.findById(user_id);
+    avatarFilename,
+  }: IUpdateUserAvatar): Promise<IUser> {
+    const user = await this.userRepository.findById(user_id);
 
     if (!user) {
       throw new AppError('User not found', StatusCodes.NOT_FOUND);
@@ -31,9 +34,9 @@ class UserAvatarService {
       }
     }
 
-    user.avatar = avatarFileName;
+    user.avatar = avatarFilename;
 
-    await UserRepository.save(user);
+    await this.userRepository.save(user);
 
     return user;
   }
