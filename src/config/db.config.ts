@@ -1,3 +1,4 @@
+import CustomLogger from '@shared/logger/CustomLogger';
 import { DataSource } from 'typeorm';
 
 export const AppDataSource = new DataSource({
@@ -10,4 +11,5 @@ export const AppDataSource = new DataSource({
   entities: ['./src/modules/**/entities/*.ts'],
   migrations: ['./src/shared/infra/typeorm/migrations/*.ts'],
   synchronize: true,
+  logger: new CustomLogger(),
 });
