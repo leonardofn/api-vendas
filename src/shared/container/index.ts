@@ -6,6 +6,7 @@ import { IProductRepository } from '@modules/product/models/product-repository.m
 import ProductRepository from '@modules/product/repositories/ProductRepository';
 import { IUserRepository } from '@modules/user/models/user-repository.model';
 import { IUserTokensRepository } from '@modules/user/models/user-tokens-repository.model';
+import '@modules/user/providers';
 import UserRepository from '@modules/user/repositories/UserRepository';
 import UserTokensRepository from '@modules/user/repositories/UserTokenRepository';
 import { container } from 'tsyringe';
