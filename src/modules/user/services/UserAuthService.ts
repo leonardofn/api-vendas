@@ -1,18 +1,20 @@
 import authConfig from '@config/auth';
 import AppError from '@shared/errors/AppError';
-import { compare } from 'bcryptjs';
 import { StatusCodes } from 'http-status-codes';
 import { sign } from 'jsonwebtoken';
 import { inject, injectable } from 'tsyringe';
 import { ILoginUser } from '../models/login-user.model';
 import { IUserAuthenticated } from '../models/user-authenticated.model';
 import { IUserRepository } from '../models/user-repository.model';
+import { IHashProvider } from '../providers/hash/models/IHashProvider';
 
 @injectable()
 class UserAuthService {
   constructor(
     @inject('UserRepository')
-    private userRepository: IUserRepository
+    private userRepository: IUserRepository,
+    @inject('HashProvider')
+    private hashProvider: IHashProvider
   ) {}
 
   public async execute({
@@ -28,7 +30,10 @@ class UserAuthService {
       );
     }
 
-    const passwordConfirmed = await compare(password, user.password);
+    const passwordConfirmed = await this.hashProvider.compareHash(
+      password,
+      user.password
+    );
 
     if (!passwordConfirmed) {
       throw new AppError(
