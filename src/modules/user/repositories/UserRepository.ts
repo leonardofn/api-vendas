@@ -1,5 +1,5 @@
-import { AppDataSource } from '@config/db.config';
 import { Repository } from 'typeorm';
+import { dataSource } from '../../../shared/infra/typeorm';
 import User from '../entities/User';
 import { ICreateUser } from '../models/create-user.model';
 import { IUserRepository } from '../models/user-repository.model';
@@ -8,7 +8,7 @@ class UserRepository implements IUserRepository {
   private ormRepository: Repository<User>;
 
   constructor() {
-    this.ormRepository = AppDataSource.getRepository(User);
+    this.ormRepository = dataSource.getRepository(User);
   }
 
   public async create({ name, email, password }: ICreateUser): Promise<User> {

@@ -1,5 +1,5 @@
-import { AppDataSource } from '@config/db.config';
 import { In, Repository } from 'typeorm';
+import { dataSource } from '../../../shared/infra/typeorm';
 import Product from '../entities/Product';
 import { ICreateProduct } from '../models/create-product.model';
 import { IProductRepository } from '../models/product-repository.model';
@@ -9,7 +9,7 @@ class ProductRepository implements IProductRepository {
   private ormRepository: Repository<Product>;
 
   constructor() {
-    this.ormRepository = AppDataSource.getRepository(Product);
+    this.ormRepository = dataSource.getRepository(Product);
   }
 
   public async create({

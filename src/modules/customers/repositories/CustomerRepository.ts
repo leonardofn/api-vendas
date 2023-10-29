@@ -1,5 +1,5 @@
-import { AppDataSource } from '@config/db.config';
 import { Repository } from 'typeorm';
+import { dataSource } from '../../../shared/infra/typeorm';
 import Customer from '../entities/Customer';
 import { ICreateCustomer } from '../models/create-customer.model';
 import { ICustomerRepository } from './../models/customer-repository.model';
@@ -8,7 +8,7 @@ class CustomerRepository implements ICustomerRepository {
   private ormRepository: Repository<Customer>;
 
   constructor() {
-    this.ormRepository = AppDataSource.getRepository(Customer);
+    this.ormRepository = dataSource.getRepository(Customer);
   }
 
   public async create({ name, email }: ICreateCustomer): Promise<Customer> {
