@@ -2,7 +2,11 @@ import { Repository } from 'typeorm';
 import { dataSource } from '../../../shared/infra/typeorm';
 import Customer from '../entities/Customer';
 import { ICreateCustomer } from '../models/create-customer.model';
-import { ICustomerRepository } from './../models/customer-repository.model';
+import { ICustomerPaginate } from '../models/customer-paginate.model';
+import {
+  ICustomerRepository,
+  SearchParams
+} from './../models/customer-repository.model';
 
 class CustomerRepository implements ICustomerRepository {
   private ormRepository: Repository<Customer>;
@@ -14,7 +18,7 @@ class CustomerRepository implements ICustomerRepository {
   public async create({ name, email }: ICreateCustomer): Promise<Customer> {
     const customer = this.ormRepository.create({
       name,
-      email,
+      email
     });
 
     await this.ormRepository.save(customer);
@@ -34,10 +38,25 @@ class CustomerRepository implements ICustomerRepository {
     return customer;
   }
 
-  public async find(): Promise<Customer[]> {
-    const customer = await this.ormRepository.find();
+  public async find({
+    page,
+    skip,
+    take
+  }: SearchParams): Promise<ICustomerPaginate> {
+    const [customers, count] = await this.ormRepository
+      .createQueryBuilder()
+      .skip(skip)
+      .take(take)
+      .getManyAndCount();
 
-    return customer;
+    const result: ICustomerPaginate = {
+      perPage: take,
+      total: count,
+      currentPage: page,
+      data: customers
+    };
+
+    return result;
   }
 
   public async findById(id: string): Promise<Customer | null> {
@@ -50,11 +69,11 @@ class CustomerRepository implements ICustomerRepository {
     const customer = await this.ormRepository.findOne({
       relations: ['orders.order_products.product'],
       where: {
-        id,
+        id
       },
       order: {
-        created_at: 'DESC',
-      },
+        created_at: 'DESC'
+      }
     });
 
     return customer;

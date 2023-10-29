@@ -14,9 +14,13 @@ export default class CustomerController {
     request: Request,
     response: Response
   ): Promise<Response> => {
-    const listCustomers = await this.customerService.index();
+    const { page: pageReq, limit: limitReq } = request.query;
+    const page = pageReq ? Number(pageReq) : 1;
+    const limit = limitReq ? Number(limitReq) : 10;
 
-    return response.json(listCustomers);
+    const customers = await this.customerService.index({ page, limit });
+
+    return response.json(customers);
   };
 
   public show = async (
@@ -38,7 +42,7 @@ export default class CustomerController {
 
     const customer = await this.customerService.create({
       name,
-      email,
+      email
     });
 
     return response.json(customer);
@@ -54,7 +58,7 @@ export default class CustomerController {
     const customer = await this.customerService.update({
       id,
       name,
-      email,
+      email
     });
 
     return response.json(customer);

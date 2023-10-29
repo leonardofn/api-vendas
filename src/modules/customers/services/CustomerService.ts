@@ -2,9 +2,15 @@ import AppError from '@shared/errors/AppError';
 import { StatusCodes } from 'http-status-codes';
 import { inject, injectable } from 'tsyringe';
 import { ICreateCustomer } from '../models/create-customer.model';
+import { ICustomerPaginate } from '../models/customer-paginate.model';
 import { ICustomerRepository } from '../models/customer-repository.model';
 import { ICustomer } from '../models/customer.model';
 import { IUpdateCustomer } from '../models/update-customer.model';
+
+interface ISearchParams {
+  page: number;
+  limit: number;
+}
 
 @injectable()
 class CustomerService {
@@ -27,16 +33,22 @@ class CustomerService {
 
     const customer = await this.customerRepository.create({
       name,
-      email,
+      email
     });
 
     return customer;
   }
 
-  public async index(): Promise<ICustomer[]> {
-    const customer = await this.customerRepository.find();
+  public async index({
+    page,
+    limit
+  }: ISearchParams): Promise<ICustomerPaginate> {
+    const take = limit;
+    const skip = (page - 1) * take;
 
-    return customer;
+    const customers = await this.customerRepository.find({ page, skip, take });
+
+    return customers;
   }
 
   public async show(id: string): Promise<ICustomer | null> {
@@ -52,7 +64,7 @@ class CustomerService {
   public async update({
     id,
     name,
-    email,
+    email
   }: IUpdateCustomer): Promise<ICustomer> {
     const customer = await this.customerRepository.findById(id);
 
