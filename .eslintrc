@@ -10,7 +10,13 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "trailingComma": "none"
+      }
+    ],
     "no-console": "warn",
-    "prettier/prettier": "error"
+    "comma-dangle": ["error", "never"]
   }
 }
