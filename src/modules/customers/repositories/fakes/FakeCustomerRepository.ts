@@ -1,8 +1,12 @@
 import Customer from '@modules/customers/entities/Customer';
 import { ICreateCustomer } from '@modules/customers/models/create-customer.model';
-import { ICustomerRepository } from '@modules/customers/models/customer-repository.model';
+import {
+  ICustomerRepository,
+  SearchParams
+} from '@modules/customers/models/customer-repository.model';
 import { ICustomer } from '@modules/customers/models/customer.model';
 import { v4 as uuidv4 } from 'uuid';
+import { ICustomerPaginate } from '../../models/customer-paginate.model';
 
 class FakeCustomersRepository implements ICustomerRepository {
   private customers: Customer[] = [];
@@ -50,8 +54,17 @@ class FakeCustomersRepository implements ICustomerRepository {
     return customer ?? null;
   }
 
-  public async find(): Promise<ICustomer[]> {
-    return this.customers;
+  public async find({
+    page,
+    skip,
+    take
+  }: SearchParams): Promise<ICustomerPaginate> {
+    return {
+      perPage: take,
+      total: this.customers.length,
+      currentPage: page,
+      data: this.customers.slice(skip, take)
+    };
   }
 
   public async remove(customer: ICustomer): Promise<ICustomer> {

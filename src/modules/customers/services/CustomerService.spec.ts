@@ -15,7 +15,7 @@ describe('CustomerService', () => {
   it('should be able to create a new customer', async () => {
     const customer = await customerService.create({
       name: 'Leonardo Dev',
-      email: 'leonardodev@test.com',
+      email: 'leonardodev@test.com'
     });
 
     expect(customer).toHaveProperty('id');
@@ -24,12 +24,12 @@ describe('CustomerService', () => {
   it('should not be able to create a two customer with the same email', async () => {
     await customerService.create({
       name: 'Leonardo Dev',
-      email: 'leonardodev@test.com',
+      email: 'leonardodev@test.com'
     });
 
     const newCustomer = customerService.create({
       name: 'Leonardo Dev',
-      email: 'leonardodev@test.com',
+      email: 'leonardodev@test.com'
     });
 
     expect(newCustomer).rejects.toBeInstanceOf(AppError);
